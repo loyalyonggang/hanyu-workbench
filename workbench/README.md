@@ -2,9 +2,9 @@
 
 ## macOS 首次安装
 
-需要可访问本仓库的 GitHub 账号，以及一台能运行 Ollama 的 Mac。下面的命令从终端执行。已安装的工具和已下载的模型可以直接复用。
+需要一台能运行 Ollama 的 Mac。可以用 Git 克隆，或直接[下载 ZIP](https://github.com/loyalyonggang/hanyu-workbench/archive/refs/heads/main.zip) 后解压。下面的命令从终端执行。已安装的工具和已下载的模型可以直接复用。
 
-1. 克隆仓库并进入目录。使用 [Homebrew](https://brew.sh/) 安装必要工具。
+1. 克隆仓库并进入目录。若已下载 ZIP，进入解压后的目录，只需执行最后一行。使用 [Homebrew](https://brew.sh/) 安装必要工具。
 
    ```bash
    git clone https://github.com/loyalyonggang/hanyu-workbench.git
