@@ -1,0 +1,4 @@
+-r ../requirements.txt
+playwright>=1.50,<2
+waitress>=3.0.2,<4
+piper-tts>=1.5,<2

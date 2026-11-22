@@ -1,0 +1,23 @@
+[Unit]
+Description=Hanyu Local Korean Translation Model
+
+[Service]
+Type=simple
+User=hanyu
+Group=hanyu
+WorkingDirectory=/data/hanyu
+Environment=LD_LIBRARY_PATH=/data/hanyu/bin/llama
+ExecStart=/data/hanyu/bin/llama/llama-server --model /data/hanyu/models/qwen2.5-1.5b-q4_0.gguf --alias Qwen2.5-1.5B --host 127.0.0.1 --port 8793 --ctx-size 2048 --parallel 1 --threads 2 --batch-size 128 --ubatch-size 64 --sleep-idle-seconds 10 --no-webui
+Restart=on-failure
+RestartSec=5
+CPUQuota=140%
+MemoryHigh=1130M
+MemoryMax=1180M
+TasksMax=90
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+
+[Install]
+WantedBy=multi-user.target

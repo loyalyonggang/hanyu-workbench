@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="workbench-token" content="__TOKEN__">
+<meta name="theme-color" content="#131512">
+<title>韩语视频工作台</title>
+<link rel="stylesheet" href="/static/style.css">
+<script src="/static/app.js" defer></script>
+</head>
+<body>
+<header class="top">
+  <div class="bar">
+    <a class="brand" href="#" aria-label="工作台首页"><span class="brand-icon" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span><span>韩语视频<span class="brand-light">工作台</span></span></a>
+    <nav aria-label="主导航"><a href="#create">新建任务</a><a href="#queue">处理队列</a></nav>
+    <div class="top-right"><span class="online"><i></i><span class="online-label">本机运行</span></span><button id="settingsButton" class="ghost">设置</button></div>
+  </div>
+</header>
+<main>
+  <section class="intro" aria-labelledby="title">
+    <div>
+      <div class="language"><span>普通话</span><span aria-hidden="true">→</span><strong>한국어</strong></div>
+      <h1 id="title">韩语视频工作台</h1>
+      <p>导入中文视频，批量生成韩语配音、韩文字幕和成片。</p>
+    </div>
+    <button id="openFolder" class="outline folder"><span aria-hidden="true" class="folder-symbol">↗</span> 打开输出目录</button>
+  </section>
+  <div class="layout" id="create">
+    <section class="panel intake" aria-labelledby="inputTitle">
+      <div class="section-head"><h2 id="inputTitle">导入视频</h2><span class="small" id="inputCount">0 / 30 条</span></div>
+      <form id="jobForm">
+        <div class="tabs" role="group" aria-label="添加方式">
+          <button type="button" class="tab active" id="linkTab" aria-controls="linksPanel" aria-pressed="true"><span aria-hidden="true">↗</span> 视频链接</button>
+          <button type="button" class="tab" id="fileTab" aria-controls="filesPanel" aria-pressed="false"><span aria-hidden="true">↥</span> 本地文件</button>
+        </div>
+        <div class="source" id="linksPanel">
+          <label class="sr" for="links">每行一个视频链接</label>
+          <textarea id="links" spellcheck="false" placeholder="粘贴视频分享链接，每行一条&#10;https://weixin.qq.com/sph/…"></textarea>
+          <p class="hint">分享链接通过 KuKuTool 下载。遇到限流或响应超时会自动排队重试。</p>
+        </div>
+        <div class="source" id="filesPanel" hidden>
+          <button type="button" id="drop" class="drop">选择或拖入视频文件<span>支持 MP4、MOV、MKV、WebM、M4V、AVI</span></button>
+          <input id="files" type="file" accept=".mp4,.mov,.mkv,.webm,.m4v,.avi" multiple hidden>
+        </div>
+        <ul class="file-list" id="selected" aria-label="已选素材" hidden></ul>
+        <div class="fields">
+          <label>韩语配音<select id="provider"><option value="local">本机韩语音色</option><option value="heygen">HeyGen 配音</option></select></label>
+          <label>原字幕处理<select id="captionMode"><option value="yellow">清理黄色字幕</option><option value="cover">字幕底板遮盖</option><option value="keep">直接叠加韩文</option></select></label>
+        </div>
+        <details class="more">
+          <summary>翻译、字幕位置与口型</summary>
+          <div class="options">
+            <label for="note">翻译备注 <span class="optional">选填</span></label>
+            <textarea id="note" maxlength="500" placeholder="例如：上司说半语，员工用敬语，保留职场笑点。"></textarea>
+            <label class="slider">字幕位置 <input id="captionY" type="range" min="45" max="92" value="83"><output id="captionOutput">83%</output></label>
+            <label class="check"><input id="watermark" type="checkbox"> 局部清理右下角，适合固定角标</label>
+            <label class="check"><input id="lipsync" type="checkbox"> 尝试 HeyGen 口型同步 <span id="lipHint">需连接 HeyGen</span></label>
+          </div>
+        </details>
+        <div class="action-row">
+          <span id="formMessage" class="message" role="status"></span>
+          <div class="job-actions">
+            <button type="submit" class="primary" id="submit">开始生成 <span aria-hidden="true">↗</span></button>
+            <button type="submit" class="outline" id="downloadSource">只下载原片</button>
+          </div>
+        </div>
+      </form>
+    </section>
+    <section class="panel sample" aria-labelledby="sampleTitle">
+      <div class="section-head"><h2 id="sampleTitle">成片示例</h2><span class="small">00:17</span></div>
+      <button id="playSample" class="sample-image" aria-label="播放二虎韩语成片"><img src="/static/sample.jpg" alt="动画角色二虎一手拿手机，在办公室接电话"><span class="play" aria-hidden="true">▶</span><span class="format" aria-hidden="true">KO</span></button>
+      <div class="sample-caption"><div><strong>二虎的职场电话</strong><span>韩语配音 · 韩文字幕 · 口型修订</span></div><button id="addSample" class="outline compact" hidden>添加原片</button></div>
+    </section>
+  </div>
+
+  <section class="panel queue" id="queue" aria-labelledby="queueTitle">
+    <div class="section-head"><div><h2 id="queueTitle">处理队列</h2><p class="hint" id="queueSummary">还没有任务</p></div><button id="batchDownload" class="outline" disabled>批量下载 <span id="downloadCount"></span></button></div>
+    <div class="filters" role="group" aria-label="筛选任务">
+      <button class="filter active" data-filter="all" aria-pressed="true">全部</button>
+      <button class="filter" data-filter="running" aria-pressed="false">处理中</button>
+      <button class="filter" data-filter="done" aria-pressed="false">已完成</button>
+      <button class="filter" data-filter="failed" aria-pressed="false">失败</button>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th><input id="selectAll" type="checkbox" aria-label="选择当前列表中的全部成片"></th><th scope="col">视频</th><th scope="col">状态</th><th scope="col">进度</th><th scope="col">成片</th></tr></thead>
+        <tbody id="jobs"></tbody>
+      </table>
+      <div class="empty" id="empty">添加视频后，可在这里查看处理进度。</div>
+    </div>
+    <p class="hint" id="queueMessage" role="status"></p>
+  </section>
+</main>
+<dialog id="settingsDialog">
+  <form id="settingsForm">
+    <div class="section-head"><h2>工作台设置</h2><button type="button" class="close" data-close aria-label="关闭设置">×</button></div>
+    <div id="health" class="health"></div>
+    <label for="apiKey">HeyGen API Key</label>
+    <input id="apiKey" class="text-input" type="password" autocomplete="off" placeholder="粘贴你的 API Key">
+    <p class="hint" id="keyStorage">密钥保存在本机。仅当选择 HeyGen 配音或口型时会调用 API。</p>
+    <div class="action-row"><button id="disconnect" type="button" class="ghost">断开连接</button><button id="connect" class="primary" type="submit">验证并连接</button></div>
+    <p id="settingsMessage" class="message" role="status"></p>
+  </form>
+</dialog>
+<dialog id="previewDialog" class="preview">
+  <div class="section-head"><h2 id="previewTitle">成片预览</h2><button type="button" class="close" data-close aria-label="关闭预览">×</button></div>
+  <video id="player" controls playsinline></video>
+</dialog>
+</body>
+</html>

@@ -1,0 +1,39 @@
+[Unit]
+Description=Hanyu Korean Video Workbench
+After=network-online.target hanyu-translate.service
+Wants=network-online.target hanyu-translate.service
+
+[Service]
+Type=simple
+User=hanyu
+Group=hanyu
+WorkingDirectory=/data/hanyu/app/workbench
+Environment=PATH=/data/hanyu/bin:/usr/local/bin:/usr/bin:/bin
+Environment=WORKBENCH_PORT=8792
+Environment=WORKBENCH_PUBLIC_HOST=hanyu.xzggai.com
+Environment=WORKBENCH_DATA_DIR=/data/hanyu/runtime
+Environment=WORKBENCH_WHISPER_MODEL=/data/hanyu/models/ggml-small-q5_1.bin
+Environment=WORKBENCH_FONT=/data/hanyu/models/Korean-Bold.otf
+Environment=WORKBENCH_LLAMA_URL=http://127.0.0.1:8793
+Environment=WORKBENCH_TRANSLATION_MODEL=Qwen2.5-1.5B
+Environment=WORKBENCH_PIPER_MODEL=/data/hanyu/models/ko_KR-kss-medium.onnx
+Environment=WORKBENCH_KUKU_MODE=playwright
+Environment=PLAYWRIGHT_BROWSERS_PATH=/data/hanyu/browser
+Environment=TMPDIR=/data/hanyu/runtime/tmp
+Environment=OMP_NUM_THREADS=2
+ExecStart=/data/hanyu/venv/bin/python app.py
+Restart=on-failure
+RestartSec=4
+TimeoutStopSec=20
+CPUQuota=150%
+MemoryMax=1050M
+TasksMax=270
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/data/hanyu/runtime
+
+[Install]
+WantedBy=multi-user.target
